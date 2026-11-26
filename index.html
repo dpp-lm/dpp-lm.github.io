@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PoolDPP: diverse sampling from language models</title>
+<meta name="description" content="PoolDPP draws a pool of candidate strings from a language model, importance-weights it, and runs a K-DPP on the pool to pick a set of answers that are good and different. NeurIPS 2026.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="A Model of Diverse Sampling from Language Models">
+<meta property="og:description" content="A model of diverse sampling from language models: a determinantal point process over strings, approximated on a pool of candidates. Interactive explanation, results, and live demo.">
+<meta property="og:url" content="https://dpp-lm.github.io/">
+<meta property="og:image" content="https://dpp-lm.github.io/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A Model of Diverse Sampling from Language Models">
+<meta name="twitter:description" content="A model of diverse sampling from language models: a determinantal point process over strings, approximated on a pool of candidates. Interactive explanation, results, and live demo.">
+<meta name="twitter:image" content="https://dpp-lm.github.io/assets/og.png">
+<link rel="canonical" href="https://dpp-lm.github.io/">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131415" media="(prefers-color-scheme: dark)">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ScholarlyArticle","headline":"A Model of Diverse Sampling from Language Models","url":"https://dpp-lm.github.io/","isPartOf":{"@type":"Periodical","name":"NeurIPS 2026"},"datePublished":"2026","author":[{"@type":"Person","name":"Manuel Prada-Corral","url":"https://manueldeprada.com/"},{"@type":"Person","name":"Yahya Emara","url":"https://yahya010.github.io/"},{"@type":"Person","name":"Timothy J. O'Donnell","url":"https://todonnell.github.io/"},{"@type":"Person","name":"Ryan Cotterell","url":"https://rycolab.io/authors/ryan/"},{"@type":"Person","name":"Tim Vieira","url":"https://timvieira.github.io/"}]}
+</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/w-hero.css">
+<link rel="stylesheet" href="css/w-samples.css">
+<link rel="stylesheet" href="css/w-volume.css">
+<link rel="stylesheet" href="css/w-pool.css">
+<link rel="stylesheet" href="css/w-frontier.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script defer src="vendor/katex/katex.min.js"></script>
+<script defer src="vendor/katex/contrib/auto-render.min.js"></script>
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">PoolDPP</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#idea">Idea</a>
+      <a href="#model">Model</a>
+      <a href="#algorithm">Algorithm</a>
+      <a href="#results">Results</a>
+      <a href="#demo">Demo</a>
+      <a href="#cite">Cite</a>
+    </nav>
+    <button class="theme-btn theme-nav" type="button">Theme: system</button>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-text">
+    <h1>A Model of Diverse Sampling from Language Models</h1>
+    <p class="lede">Independent samples from a language model often repeat one idea. We define a probability distribution over sets of answers that favors sets of good and different answers, and an algorithm, PoolDPP, that samples from it.</p>
+    <ul class="authors">
+      <li><a href="https://manueldeprada.com/">Manuel Prada-Corral</a><sup>1,2,3</sup></li>
+      <li><a href="https://yahya010.github.io/">Yahya Emara</a><sup>4</sup></li>
+      <li><a href="https://todonnell.github.io/">Timothy J. O'Donnell</a><sup>5,6,7,8</sup></li>
+      <li><a href="https://rycolab.io/authors/ryan/">Ryan Cotterell</a><sup>1</sup></li>
+      <li><a href="https://timvieira.github.io/">Tim Vieira</a><sup>1</sup></li>
+    </ul>
+    <p class="affils">
+      <span><sup>1</sup>ETH Zürich</span>
+      <span><sup>2</sup>MPI-IS</span>
+      <span><sup>3</sup>ELLIS Institute Tübingen</span>
+      <span><sup>4</sup>Cornell University</span>
+      <span><sup>5</sup>McGill University</span>
+      <span><sup>6</sup>Mila</span>
+      <span><sup>7</sup>Canada CIFAR AI Chair</span>
+      <span><sup>8</sup>CHI-FRO</span>
+    </p>
+    <p class="buttons">
+      <a class="btn btn-primary" href="https://arxiv.org/abs/2611.25003">Paper</a>
+      <a class="btn" href="https://neurips.cc/virtual/2026/poster/151475">NeurIPS page</a>
+      <a class="btn" href="https://github.com/rycolab/pool-dpp">Code</a>
+      <a class="btn" href="/demo/">Live demo</a>
+      <a class="btn" href="#cite">Cite</a>
+    </p>
+    </div>
+    <div class="hero-fig"><div class="widget" data-widget="hero"><noscript><p class="widget-error">This figure needs JavaScript.</p></noscript></div></div>
+  </div>
+</section>
+
+<div class="prose">
+  <aside class="tldr" aria-label="Summary">
+    <h2>In brief</h2>
+    <ul>
+      <li>We model sets of answers from language models using a determinantal point process (DPP). A set's probability is proportional to the squared volume spanned by its members' embeddings, each scaled by the answer's quality.</li>
+      <li>The model ranges over all strings, so PoolDPP approximates it. It draws a pool of N candidates from the language model, reweights them, and selects a set from the pool. In its sampling mode, the KL divergence from the exact model is at most a bound that decays as 1/N.</li>
+      <li>On open-ended generation and ambiguous text-to-SQL, PoolDPP extends the measured quality-diversity and precision-recall frontiers. On math reasoning it raises diversity and gives up at most 0.01 pass@K.</li>
+    </ul>
+  </aside>
+</div>
+
+<section class="sec" id="idea" aria-labelledby="idea-h">
+  <div class="prose">
+    <h2 id="idea-h">Independent samples repeat the same idea</h2>
+    <p>Ask a language model to “Suggest a birthday gift for a friend.” five times, and the answers cluster around a few ideas in different words. The model draws each string on its own, so a repeat costs nothing. The figure maps a pool of 200 draws from Qwen3 14B, each placed by an embedding of its text. It marks five independent samples and the five answers that PoolDPP picks from the same pool.</p>
+    <p class="try"><strong>Try it.</strong> Choose another prompt and draw new independent samples, then compare where the two sets sit on the map.</p>
+  </div>
+  <div class="wide"><div class="widget" data-widget="samples"><noscript><p class="widget-error">This figure needs JavaScript.</p></noscript></div></div>
+  <div class="prose">
+    <aside class="finding"><p>Independent samples often land close together. PoolDPP's picks from the same pool are spread out.</p></aside>
+  </div>
+</section>
+
+<section class="sec" id="model" aria-labelledby="model-h">
+  <div class="prose">
+    <h2 id="model-h">Diversity as volume</h2>
+    <p>Think of each answer as an arrow. Its direction is its meaning, given by an embedding, and its length grows with its quality, given by the language model's probability. A DPP gives a set of answers a probability proportional to the squared area that their arrows span.</p>
+    <p class="try"><strong>Try it.</strong> Pick two arrows and read the parallelogram they span. Then move the global temperature T, which sets how much the arrows' lengths differ.</p>
+  </div>
+  <div class="wide"><div class="widget" data-widget="volume"><noscript><p class="widget-error">This figure needs JavaScript.</p></noscript></div></div>
+  <div class="prose">
+    <h3 class="insym">Formally</h3>
+    <p>Each answer \(y\) has a quality \(\kappa(y) \ge 0\) and a unit embedding \(\phi(y)\). Its arrow is the quality-scaled embedding \(\sqrt{\kappa(y)}\,\phi(y)\). A DPP combines the two in the kernel</p>
+    <p class="eq">\[ L(x,y) = \sqrt{\kappa(x)}\,\phi(x)^\top \phi(y)\,\sqrt{\kappa(y)}. \]</p>
+    <p>A K-DPP is a distribution over sets \(S\) of exactly \(K\) answers with \(P(S) \propto \det L_S\), where \(L_S\) is the kernel restricted to \(S\). The determinant is the squared volume spanned by the arrows of \(S\), and it factors into a quality term and a diversity term:</p>
+    <p class="eq">\[ \det L_S = \Big(\prod_{y \in S} \kappa(y)\Big)\,\det\!\big(\Phi_S^\top \Phi_S\big). \]</p>
+    <p>Here \(\Phi_S\) has the unit embeddings of \(S\) as columns. The global temperature \(T\) sets the quality as \(\kappa(y) = p(y)^{1/T}\), where \(p(y)\) is the language model's probability of the string \(y\).</p>
+    <aside class="finding"><p>Two similar answers span a thin parallelogram, so a DPP rarely picks them together even when both have high quality. A small T lets the likely answers dominate. A large T makes all arrows equally long, so only direction counts.</p></aside>
+  </div>
+</section>
+
+<section class="sec" id="algorithm" aria-labelledby="algorithm-h">
+  <div class="prose">
+    <h2 id="algorithm-h">Approximation scheme in PoolDPP</h2>
+    <p>The K-DPP of the previous section ranges over all strings the language model is defined over, and exact inference in it is intractable. PoolDPP replaces it with a finite problem in three steps.</p>
+    <ol class="steps">
+      <li>Draw a pool of \(N\) strings from a proposal \(q\). We use the language model sampled token by token at a local temperature \(T'\).</li>
+      <li>Give each string the importance weight \(w = \kappa / q\), which corrects for drawing from \(q\) instead of the target quality \(\kappa\).</li>
+      <li>Run a K-DPP on the pool, with \(\sqrt{w/N}\,\phi\) as each draw's arrow.</li>
+    </ol>
+    <p>The pool supports two modes. PoolDPP-Samp draws a set from the pool K-DPP. PoolDPP-MAP looks for the pool's set of largest determinant with a greedy algorithm, using \(\kappa\) in place of \(w\). The figure runs PoolDPP-Samp on the toy model of the previous section, where the exact target is known.</p>
+    <p class="try"><strong>Try it.</strong> Draw pools of different sizes and compare each pool's distribution over pairs with the exact target. Then switch to the average over pools and read the chart of KL divergence against N.</p>
+  </div>
+  <div class="wide"><div class="widget" data-widget="pool"><noscript><p class="widget-error">This figure needs JavaScript.</p></noscript></div></div>
+  <div class="prose">
+    <aside class="finding"><p>A small pool misses rare answers, and its distribution is far from the target. Averaged over pools, the KL divergence falls as the pool grows and stays below the paper's bound.</p></aside>
+    <aside class="guarantee">
+      <h3>Guarantee</h3>
+      <p>Write \(p_K\) for the target K-DPP over all strings and \(\bar\pi\) for the distribution of the set that PoolDPP-Samp returns, averaged over random pools. Then</p>
+      <p class="eq">\[ \begin{aligned} \mathrm{KL}\big(p_K \,\|\, \bar\pi\big) &\le \log\!\Big(1 + \frac{\operatorname{Var}(\hat Z)}{Z^2}\Big) \\ &\le \frac{K^2 \rho}{N - K + 1} \end{aligned} \]</p>
+      <p>where \(Z\) is the target's normalizer, \(\hat Z\) is its estimate from the pool, and \(\rho\) measures the mismatch between the proposal and the target (the second bound needs a finite \(\rho\)). The bound holds at every pool size and decays as \(1/N\). It is an upper bound, so the divergence can fall faster, as it does in the toy model above. It covers PoolDPP-Samp only: PoolDPP-MAP is a deterministic function of the pool and has no distributional guarantee. The theorems are formalized in Lean, see the <a href="https://github.com/rycolab/pool-dpp/tree/main/lean">code repository</a>.</p>
+    </aside>
+  </div>
+</section>
+
+<section class="sec" id="results" aria-labelledby="results-h">
+  <div class="prose">
+    <h2 id="results-h">Measured frontiers</h2>
+    <p>Sweeping the global temperature T traces a curve between quality and diversity. The figure shows the paper's measured curves for PoolDPP and the baselines on open-ended generation (FineWeb), ambiguous text-to-SQL (Ambrosia), and math reasoning (GSM8K). Each point is labeled with its temperature: the local sampling temperature T' for the baselines, and the global temperature T for PoolDPP.</p>
+  </div>
+  <div class="wide"><div class="widget" data-widget="frontier"><noscript><p class="widget-error">This figure needs JavaScript.</p></noscript></div></div>
+  </section>
+
+<section class="sec" id="demo" aria-labelledby="demo-h">
+  <div class="wide">
+    <div class="demo-card">
+      <a class="demo-shot" href="/demo/"><img src="assets/demo.png" width="2400" height="1440" loading="lazy" alt="The live demo: a 3-D view of 200 completions with the selected set and its spanned volume"></a>
+      <div class="demo-text">
+        <h2 id="demo-h">Try it on a live model</h2>
+        <p>Type a prompt and compare independent samples with the set PoolDPP picks. The demo runs Qwen3 14B on the authors' GPU server, and the demo page states what it logs.</p>
+        <p><a class="btn btn-primary" href="/demo/">Open the live demo</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="cite" aria-labelledby="cite-h">
+  <div class="prose">
+    <h2 id="cite-h">Cite</h2>
+    <div class="bib">
+      <button class="copy-btn" id="copy-btn" type="button">Copy</button>
+<pre id="bibtex"><code>@inproceedings{pradacorral2026model,
+  title     = {A Model of Diverse Sampling from Language Models},
+  author    = {Prada-Corral, Manuel and Emara, Yahya and O'Donnell, Timothy J. and Cotterell, Ryan and Vieira, Tim},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026},
+  url       = {https://arxiv.org/abs/2611.25003}
+}</code></pre>
+    </div>
+  </div>
+</section>
+</main>
+
+</body>
+</html>

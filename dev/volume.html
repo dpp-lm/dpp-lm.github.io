@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Volume widget</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/w-volume.css">
+<style>body { margin: 0; padding: 1rem; background: var(--bg); color: var(--ink); font-family: var(--font); } .widget { max-width: var(--w-wide); margin: 0 auto; }</style>
+</head>
+<body>
+<div class="widget" id="w"></div>
+<script type="module">
+import { mount } from '../js/w-volume.js';
+mount(document.getElementById('w'));
+</script>
+</body>
+</html>

@@ -1,0 +1,886 @@
+{
+ "tasks": [
+  {
+   "id": "intrinsic",
+   "tab": "Open-ended generation",
+   "dataset": "FineWeb",
+   "title": "Open-ended generation (FineWeb)",
+   "x": {
+    "label": "Diversity (log-determinant of Gram matrix)",
+    "dir": "more diverse",
+    "meaning": "log-determinant of the normalized embedding Gram matrix of the selected set"
+   },
+   "y": {
+    "label": "Quality (mean log-probability)",
+    "dir": "higher quality",
+    "meaning": "mean language-model log-probability of the selected strings"
+   },
+   "K": 10,
+   "pools": 10,
+   "pool_size": 400,
+   "y_margin": 0.07,
+   "caption": "Quality against diversity for 50 open-ended FineWeb prompts. Each point is a set of K=10 completions per prompt (Gemma-2-9B-Instruct, MiniLM-L6 embeddings, pool size N=400), averaged over prompts and over 10 sampled sets. Bars are 95% t-intervals over 10 pools.",
+   "result": "PoolDPP-MAP reaches a higher diversity than k-means with almost no loss of quality, while k-means keeps the highest quality at lower diversity. PoolDPP-Samp does not dominate k-means on these two measures: it samples from the pool distribution, while PoolDPP-MAP maximizes the determinant over the pool.",
+   "ci": "95% t-interval over pools",
+   "methods": [
+    {
+     "id": "ancestral",
+     "name": "Ancestral",
+     "color": "--m-ancestral",
+     "dash": [],
+     "knob": "T'",
+     "points": [
+      {
+       "knob": 0.6,
+       "label": "0.6",
+       "x": -8.448946355314275,
+       "y": -39.400354987266205,
+       "x_ci": 0.125841184688299,
+       "y_ci": 0.10390138150983237,
+       "n": 10
+      },
+      {
+       "knob": 0.8,
+       "label": "0.8",
+       "x": -6.957645262776401,
+       "y": -53.402954471750704,
+       "x_ci": 0.06392063560730693,
+       "y_ci": 0.18747478177175195,
+       "n": 10
+      },
+      {
+       "knob": 1.0,
+       "label": "1.0",
+       "x": -5.276340486321628,
+       "y": -81.95623426813845,
+       "x_ci": 0.09343578425663503,
+       "y_ci": 0.31158425321441624,
+       "n": 10
+      },
+      {
+       "knob": 1.2,
+       "label": "1.2",
+       "x": -3.194848606845581,
+       "y": -158.03704206036386,
+       "x_ci": 0.034395157464901654,
+       "y_ci": 0.653453130790428,
+       "n": 10
+      },
+      {
+       "knob": 1.5,
+       "label": "1.5",
+       "x": -1.5560141468972333,
+       "y": -464.8917142494609,
+       "x_ci": 0.013605663276974647,
+       "y_ci": 1.632329563302387,
+       "n": 10
+      }
+     ]
+    },
+    {
+     "id": "kmeans",
+     "name": "k-means",
+     "color": "--m-kmeans",
+     "dash": [
+      12,
+      4
+     ],
+     "knob": "T'",
+     "points": [
+      {
+       "knob": 0.6,
+       "label": "0.6",
+       "x": -6.6676199206318785,
+       "y": -24.781509575251526,
+       "x_ci": 0.06875300602832263,
+       "y_ci": 0.1386555843465684,
+       "n": 10
+      },
+      {
+       "knob": 0.8,
+       "label": "0.8",
+       "x": -5.723634340369527,
+       "y": -29.795056324067282,
+       "x_ci": 0.06203647751710241,
+       "y_ci": 0.19164054415997211,
+       "n": 10
+      },
+      {
+       "knob": 1.0,
+       "label": "1.0",
+       "x": -4.695503307958411,
+       "y": -40.32752103231919,
+       "x_ci": 0.03827204372228729,
+       "y_ci": 0.23543971397928332,
+       "n": 10
+      },
+      {
+       "knob": 1.2,
+       "label": "1.2",
+       "x": -3.2114741135103073,
+       "y": -68.74149922982046,
+       "x_ci": 0.03648953226478043,
+       "y_ci": 0.5847922002579727,
+       "n": 10
+      },
+      {
+       "knob": 1.5,
+       "label": "1.5",
+       "x": -1.33552529618116,
+       "y": -272.75082478623193,
+       "x_ci": 0.01839307056388078,
+       "y_ci": 1.6964739199847356,
+       "n": 10
+      }
+     ]
+    },
+    {
+     "id": "samp",
+     "name": "PoolDPP-Samp",
+     "color": "--m-samp",
+     "dash": [
+      6,
+      2,
+      2,
+      2
+     ],
+     "knob": "T",
+     "held_local_T": 1.0,
+     "points": [
+      {
+       "knob": 0.428571,
+       "label": "0.43",
+       "x": -6.770542136723499,
+       "y": -33.66771133504366,
+       "x_ci": 0.17338588556037016,
+       "y_ci": 0.31192491088764335,
+       "n": 10
+      },
+      {
+       "knob": 0.666667,
+       "label": "0.67",
+       "x": -6.341234641434072,
+       "y": -34.4950018506092,
+       "x_ci": 0.12749599639302797,
+       "y_ci": 0.3166384805238,
+       "n": 10
+      },
+      {
+       "knob": 0.818182,
+       "label": "0.82",
+       "x": -5.7051199201380935,
+       "y": -37.668548719240114,
+       "x_ci": 0.07193232229382901,
+       "y_ci": 0.30806726282060715,
+       "n": 10
+      },
+      {
+       "knob": 1.0,
+       "label": "1",
+       "x": -4.128527794336028,
+       "y": -84.39919430054721,
+       "x_ci": 0.028783562676015513,
+       "y_ci": 0.18293495463101464,
+       "n": 10
+      },
+      {
+       "knob": 1.22222,
+       "label": "1.2",
+       "x": -2.5043487122210375,
+       "y": -147.77525105825194,
+       "x_ci": 0.05248020361458563,
+       "y_ci": 0.5694868220261784,
+       "n": 10
+      }
+     ]
+    },
+    {
+     "id": "map",
+     "name": "PoolDPP-MAP",
+     "color": "--m-map",
+     "dash": [
+      2,
+      2
+     ],
+     "knob": "T",
+     "held_local_T": 1.0,
+     "points": [
+      {
+       "knob": 500.0,
+       "label": "500",
+       "x": -0.8792095676337357,
+       "y": -61.16311749324465,
+       "x_ci": 0.022433281233231576,
+       "y_ci": 0.40403915323335143,
+       "n": 10
+      },
+      {
+       "knob": 100.0,
+       "label": "100",
+       "x": -1.682354667299272,
+       "y": -44.691621152578406,
+       "x_ci": 0.0399041224585402,
+       "y_ci": 0.47178248544950757,
+       "n": 10
+      },
+      {
+       "knob": 50.0,
+       "label": "50",
+       "x": -2.363983829367533,
+       "y": -40.019498621642626,
+       "x_ci": 0.043641765202584344,
+       "y_ci": 0.3871402883667285,
+       "n": 10
+      },
+      {
+       "knob": 25.0,
+       "label": "25",
+       "x": -3.2805416758343178,
+       "y": -36.773681089786336,
+       "x_ci": 0.046726799778264716,
+       "y_ci": 0.36116625747517045,
+       "n": 10
+      },
+      {
+       "knob": 10.0,
+       "label": "10",
+       "x": -4.658010551939737,
+       "y": -34.531715890049384,
+       "x_ci": 0.07233387354239117,
+       "y_ci": 0.2767348213387207,
+       "n": 10
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ambrosia",
+   "tab": "Ambiguous text-to-SQL",
+   "dataset": "Ambrosia",
+   "title": "Ambiguous text-to-SQL (Ambrosia)",
+   "x": {
+    "label": "Recall: golden query coverage",
+    "dir": "higher recall",
+    "meaning": "fraction of annotated golden interpretations matched by the selected queries"
+   },
+   "y": {
+    "label": "Precision: golden accuracy",
+    "dir": "higher precision",
+    "meaning": "fraction of selected queries whose whole execution result equals a golden result"
+   },
+   "K": 3,
+   "pools": 100,
+   "pool_size": 200,
+   "y_margin": 0.05,
+   "caption": "Precision against recall on Ambrosia, where each question has up to 3 valid SQL interpretations. Each point is a set of K=3 queries per question (Gemma-2-9B-Instruct, MiniLM-L6 embeddings, pool size N=200). Precision counts a query only if its whole execution result matches a golden result. Bars are 95% t-intervals over 100 pools.",
+   "result": "PoolDPP-MAP holds the high-recall end of the frontier, above k-means, and PoolDPP-Samp lies above k-means across its sweep. Ancestral sampling at T' of 0.7 or less holds the high-precision, low-recall end.",
+   "ci": "95% t-interval over pools",
+   "methods": [
+    {
+     "id": "ancestral",
+     "name": "Ancestral",
+     "color": "--m-ancestral",
+     "dash": [],
+     "knob": "T'",
+     "points": [
+      {
+       "knob": 0.6,
+       "label": "0.6",
+       "x": 0.22341999999999998,
+       "y": 0.41595666666666675,
+       "x_ci": 0.000622506173113125,
+       "y_ci": 0.0008176222245402986,
+       "n": 100
+      },
+      {
+       "knob": 0.7,
+       "label": "0.7",
+       "x": 0.22581833333333334,
+       "y": 0.41203500000000004,
+       "x_ci": 0.0006801487256807596,
+       "y_ci": 0.0010150948824277244,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1.0",
+       "x": 0.2330833333333333,
+       "y": 0.3937850000000001,
+       "x_ci": 0.0006689206855058535,
+       "y_ci": 0.0011394028186026508,
+       "n": 100
+      },
+      {
+       "knob": 1.2,
+       "label": "1.2",
+       "x": 0.23213333333333336,
+       "y": 0.36397999999999997,
+       "x_ci": 0.0007273184231544295,
+       "y_ci": 0.0012111484227926318,
+       "n": 100
+      },
+      {
+       "knob": 1.25,
+       "label": "1.25",
+       "x": 0.22991666666666666,
+       "y": 0.3499616666666666,
+       "x_ci": 0.0008269975393333884,
+       "y_ci": 0.0012238022621612267,
+       "n": 100
+      },
+      {
+       "knob": 1.3,
+       "label": "1.3",
+       "x": 0.22649333333333335,
+       "y": 0.33298833333333333,
+       "x_ci": 0.0008839876651995733,
+       "y_ci": 0.0014147458993943993,
+       "n": 100
+      }
+     ]
+    },
+    {
+     "id": "kmeans",
+     "name": "k-means",
+     "color": "--m-kmeans",
+     "dash": [
+      12,
+      4
+     ],
+     "knob": "T'",
+     "points": [
+      {
+       "knob": 0.6,
+       "label": "0.6",
+       "x": 0.23833833333333335,
+       "y": 0.3813916666666667,
+       "x_ci": 0.0009685396379439283,
+       "y_ci": 0.001271460715136202,
+       "n": 100
+      },
+      {
+       "knob": 0.7,
+       "label": "0.7",
+       "x": 0.23854333333333333,
+       "y": 0.3760166666666666,
+       "x_ci": 0.0008192958772510886,
+       "y_ci": 0.0015296298902905017,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1.0",
+       "x": 0.23958833333333335,
+       "y": 0.36446,
+       "x_ci": 0.0008313534817723942,
+       "y_ci": 0.0012904056790019587,
+       "n": 100
+      },
+      {
+       "knob": 1.2,
+       "label": "1.2",
+       "x": 0.23982666666666672,
+       "y": 0.35510666666666657,
+       "x_ci": 0.0009387277759811099,
+       "y_ci": 0.0015880938178235633,
+       "n": 100
+      },
+      {
+       "knob": 1.25,
+       "label": "1.25",
+       "x": 0.23910833333333337,
+       "y": 0.3505500000000001,
+       "x_ci": 0.0011334740078849162,
+       "y_ci": 0.0015434337420620683,
+       "n": 100
+      },
+      {
+       "knob": 1.3,
+       "label": "1.3",
+       "x": 0.233315,
+       "y": 0.33132333333333336,
+       "x_ci": 0.0012496175298946372,
+       "y_ci": 0.0017216437964131634,
+       "n": 100
+      }
+     ]
+    },
+    {
+     "id": "samp",
+     "name": "PoolDPP-Samp",
+     "color": "--m-samp",
+     "dash": [
+      6,
+      2,
+      2,
+      2
+     ],
+     "knob": "T",
+     "held_local_T": 1.0,
+     "points": [
+      {
+       "knob": 0.428571,
+       "label": "0.43",
+       "x": 0.23378333333333334,
+       "y": 0.39435000000000003,
+       "x_ci": 0.0006801065766544694,
+       "y_ci": 0.0009921919830932,
+       "n": 100
+      },
+      {
+       "knob": 0.538462,
+       "label": "0.54",
+       "x": 0.237205,
+       "y": 0.3907666666666666,
+       "x_ci": 0.0007161118741264626,
+       "y_ci": 0.001013436156629283,
+       "n": 100
+      },
+      {
+       "knob": 0.666667,
+       "label": "0.67",
+       "x": 0.24128666666666676,
+       "y": 0.38513666666666674,
+       "x_ci": 0.0006190824553752579,
+       "y_ci": 0.0009960022373606907,
+       "n": 100
+      },
+      {
+       "knob": 0.818182,
+       "label": "0.82",
+       "x": 0.24439833333333333,
+       "y": 0.3751366666666667,
+       "x_ci": 0.0006620883331582433,
+       "y_ci": 0.0010081726156146156,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1",
+       "x": 0.24447500000000003,
+       "y": 0.3532566666666667,
+       "x_ci": 0.0008865265299488258,
+       "y_ci": 0.0011610611895688963,
+       "n": 100
+      }
+     ]
+    },
+    {
+     "id": "map",
+     "name": "PoolDPP-MAP",
+     "color": "--m-map",
+     "dash": [
+      2,
+      2
+     ],
+     "knob": "T",
+     "held_local_T": 1.5,
+     "points": [
+      {
+       "knob": 10.0,
+       "label": "10",
+       "x": 0.25065000000000004,
+       "y": 0.32203333333333334,
+       "x_ci": 0.0018665373889987344,
+       "y_ci": 0.002350005216259065,
+       "n": 100
+      },
+      {
+       "knob": 7.5,
+       "label": "7.5",
+       "x": 0.24955000000000002,
+       "y": 0.33480000000000004,
+       "x_ci": 0.0019288020153523505,
+       "y_ci": 0.002209330490714543,
+       "n": 100
+      },
+      {
+       "knob": 3.0,
+       "label": "3",
+       "x": 0.24321666666666666,
+       "y": 0.3652,
+       "x_ci": 0.0020130991317388646,
+       "y_ci": 0.0019319065987406865,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1",
+       "x": 0.23758333333333329,
+       "y": 0.39159999999999995,
+       "x_ci": 0.0015146504473935944,
+       "y_ci": 0.002167248767099163,
+       "n": 100
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "gsm8k",
+   "tab": "Math reasoning",
+   "dataset": "GSM8K",
+   "title": "Math reasoning (GSM8K)",
+   "x": {
+    "label": "Diversity (log-determinant of Gram matrix)",
+    "dir": "more diverse",
+    "meaning": "log-determinant of the embedding Gram matrix of the selected chains"
+   },
+   "y": {
+    "label": "Accuracy (pass@K=10)",
+    "dir": "higher accuracy",
+    "meaning": "fraction of problems where at least one of the K=10 selected chains is correct"
+   },
+   "K": 10,
+   "pools": 100,
+   "pool_size": null,
+   "y_margin": 0.05,
+   "caption": "Accuracy against diversity on GSM8K, for 50 questions. Each point is a set of K=10 reasoning chains per question (Gemma-2-9B-Instruct, Qwen3-Embedding-0.6B embeddings). Point labels are the local sampling temperature T' for ancestral sampling, naive DPP, and k-means, and the global temperature T for PoolDPP-Samp and PoolDPP-MAP, which both draw the pool at T' = 1.2. Bars are 95% t-intervals over 100 pools.",
+   "result": "PoolDPP raises diversity past the plotted ancestral settings and gives up at most 0.01 pass@K: 0.915 for both modes against 0.925 for the best ancestral setting. At equal diversity, neither mode has a higher pass@K than ancestral sampling, so the gain is in diversity, not in coverage.",
+   "ci": "95% t-interval over pools",
+   "methods": [
+    {
+     "id": "ancestral",
+     "name": "Ancestral",
+     "color": "--m-ancestral",
+     "dash": [],
+     "knob": "T'",
+     "points": [
+      {
+       "knob": 0.5,
+       "label": "0.5",
+       "x": -33.128704290144235,
+       "y": 0.86328,
+       "x_ci": 0.056377282751821654,
+       "y_ci": 0.0009547595762005968,
+       "n": 100
+      },
+      {
+       "knob": 0.8,
+       "label": "0.8",
+       "x": -26.32528480675446,
+       "y": 0.8823400000000001,
+       "x_ci": 0.026736809293282805,
+       "y_ci": 0.0011992568019058496,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1.0",
+       "x": -23.761893232132206,
+       "y": 0.9024400000000001,
+       "x_ci": 0.02036137855957585,
+       "y_ci": 0.001785086944249796,
+       "n": 100
+      },
+      {
+       "knob": 1.2,
+       "label": "1.2",
+       "x": -20.04550981237308,
+       "y": 0.9248400000000001,
+       "x_ci": 0.025370451876187593,
+       "y_ci": 0.0015168399388654963,
+       "n": 100
+      }
+     ]
+    },
+    {
+     "id": "naive",
+     "name": "Naive DPP",
+     "color": "--m-naive",
+     "dash": [
+      12,
+      4,
+      2,
+      4,
+      2,
+      4
+     ],
+     "knob": "T'",
+     "points": [
+      {
+       "knob": 0.5,
+       "label": "0.5",
+       "x": -26.633375692989947,
+       "y": 0.8670800000000001,
+       "x_ci": 0.02688298493278159,
+       "y_ci": 0.0013992726795709844,
+       "n": 100
+      },
+      {
+       "knob": 0.8,
+       "label": "0.8",
+       "x": -23.001122155573842,
+       "y": 0.88568,
+       "x_ci": 0.03119218902505321,
+       "y_ci": 0.001768200256207907,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1.0",
+       "x": -20.70981757350727,
+       "y": 0.9055200000000001,
+       "x_ci": 0.03529875691698447,
+       "y_ci": 0.0021434738675751427,
+       "n": 100
+      }
+     ]
+    },
+    {
+     "id": "kmeans",
+     "name": "k-means",
+     "color": "--m-kmeans",
+     "dash": [
+      12,
+      4
+     ],
+     "knob": "T'",
+     "points": [
+      {
+       "knob": 0.5,
+       "label": "0.5",
+       "x": -26.21750774907395,
+       "y": 0.86342,
+       "x_ci": 0.031883922959195746,
+       "y_ci": 0.0014361602025920535,
+       "n": 100
+      },
+      {
+       "knob": 0.8,
+       "label": "0.8",
+       "x": -23.15699199066585,
+       "y": 0.87274,
+       "x_ci": 0.043022132604878215,
+       "y_ci": 0.0020193059262664146,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1.0",
+       "x": -20.658679894993657,
+       "y": 0.8881599999999998,
+       "x_ci": 0.05131055877969248,
+       "y_ci": 0.002819498527385159,
+       "n": 100
+      },
+      {
+       "knob": 1.2,
+       "label": "1.2",
+       "x": -13.838091041814849,
+       "y": 0.9053200000000001,
+       "x_ci": 0.06590154694588192,
+       "y_ci": 0.002801124805553437,
+       "n": 100
+      }
+     ]
+    },
+    {
+     "id": "samp",
+     "name": "PoolDPP-Samp",
+     "color": "--m-samp",
+     "dash": [
+      6,
+      2,
+      2,
+      2
+     ],
+     "knob": "T",
+     "held_local_T": 1.2,
+     "points": [
+      {
+       "knob": 0.428571,
+       "label": "0.429",
+       "x": -24.82708271666106,
+       "y": 0.8937,
+       "x_ci": 0.06117586199482315,
+       "y_ci": 0.0033347512163389784,
+       "n": 100
+      },
+      {
+       "knob": 0.666667,
+       "label": "0.667",
+       "x": -23.85218905966451,
+       "y": 0.89364,
+       "x_ci": 0.05291185668636124,
+       "y_ci": 0.002941382480610066,
+       "n": 100
+      },
+      {
+       "knob": 0.818182,
+       "label": "0.818",
+       "x": -22.79371252119967,
+       "y": 0.89402,
+       "x_ci": 0.04932534961709848,
+       "y_ci": 0.002593700842175948,
+       "n": 100
+      },
+      {
+       "knob": 1.0,
+       "label": "1",
+       "x": -20.561078758311318,
+       "y": 0.9079,
+       "x_ci": 0.032513429271804034,
+       "y_ci": 0.0023893136087370726,
+       "n": 100
+      },
+      {
+       "knob": 1.03,
+       "label": "1.03",
+       "x": -19.007120533769022,
+       "y": 0.9151600000000002,
+       "x_ci": 0.0403836492071505,
+       "y_ci": 0.0022787704428264164,
+       "n": 100
+      },
+      {
+       "knob": 1.05,
+       "label": "1.05",
+       "x": -15.776472145582124,
+       "y": 0.9148400000000002,
+       "x_ci": 0.056204576206358624,
+       "y_ci": 0.0031486748824926074,
+       "n": 100
+      },
+      {
+       "knob": 1.07,
+       "label": "1.07",
+       "x": -13.860275578593143,
+       "y": 0.9090600000000001,
+       "x_ci": 0.05830766562474512,
+       "y_ci": 0.004854245604469726,
+       "n": 100
+      },
+      {
+       "knob": 1.1,
+       "label": "1.1",
+       "x": -12.867848196925765,
+       "y": 0.90762,
+       "x_ci": 0.05541041978345167,
+       "y_ci": 0.005386795867355032,
+       "n": 100
+      },
+      {
+       "knob": 1.22222,
+       "label": "1.22",
+       "x": -12.39454958572946,
+       "y": 0.9078,
+       "x_ci": 0.052847516222422966,
+       "y_ci": 0.005748455377652456,
+       "n": 100
+      }
+     ]
+    },
+    {
+     "id": "map",
+     "name": "PoolDPP-MAP",
+     "color": "--m-map",
+     "dash": [
+      2,
+      2
+     ],
+     "knob": "T",
+     "held_local_T": 1.2,
+     "points": [
+      {
+       "knob": 2.5,
+       "label": "2.5",
+       "x": -23.129523488427704,
+       "y": 0.8954000000000002,
+       "x_ci": 0.0613452059730073,
+       "y_ci": 0.003424244442250856,
+       "n": 100
+      },
+      {
+       "knob": 5.0,
+       "label": "5",
+       "x": -21.377854951966807,
+       "y": 0.8970000000000001,
+       "x_ci": 0.05812485430536385,
+       "y_ci": 0.0034483167557899444,
+       "n": 100
+      },
+      {
+       "knob": 10.0,
+       "label": "10",
+       "x": -19.18928437057558,
+       "y": 0.8989999999999999,
+       "x_ci": 0.060446677079127376,
+       "y_ci": 0.0033547856452056323,
+       "n": 100
+      },
+      {
+       "knob": 15.0,
+       "label": "15",
+       "x": -17.81079928025188,
+       "y": 0.8994000000000001,
+       "x_ci": 0.06408900949927268,
+       "y_ci": 0.0031634530734988503,
+       "n": 100
+      },
+      {
+       "knob": 20.0,
+       "label": "20",
+       "x": -16.830943082547805,
+       "y": 0.9030000000000002,
+       "x_ci": 0.0635513149783206,
+       "y_ci": 0.003628152683422992,
+       "n": 100
+      },
+      {
+       "knob": 25.0,
+       "label": "25",
+       "x": -16.09955710840846,
+       "y": 0.9052000000000001,
+       "x_ci": 0.06283669932493226,
+       "y_ci": 0.003725283959415563,
+       "n": 100
+      },
+      {
+       "knob": 50.0,
+       "label": "50",
+       "x": -13.939431117635262,
+       "y": 0.9124,
+       "x_ci": 0.06034170421005704,
+       "y_ci": 0.003774492757657584,
+       "n": 100
+      },
+      {
+       "knob": 100.0,
+       "label": "100",
+       "x": -12.187797746436031,
+       "y": 0.9154000000000001,
+       "x_ci": 0.05837149777695785,
+       "y_ci": 0.004022382634853769,
+       "n": 100
+      },
+      {
+       "knob": 500.0,
+       "label": "500",
+       "x": -9.616524776992147,
+       "y": 0.9152,
+       "x_ci": 0.05150951136142876,
+       "y_ci": 0.005203940942227809,
+       "n": 100
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "provenance": {
+  "repo": "https://github.com/rycolab/pool-dpp",
+  "commit": "a66519a",
+  "files": [
+   "analysis/intrinsic_points.json",
+   "analysis/ambrosia_points.json",
+   "analysis/gsm8k_points.json"
+  ],
+  "plot_scripts": [
+   "analysis/plot_intrinsic.py",
+   "analysis/plot_ambrosia.py",
+   "analysis/plot_gsm8k.py"
+  ]
+ }
+}

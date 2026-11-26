@@ -1,0 +1,52 @@
+[
+ {
+  "id": "gift",
+  "prompt": "Suggest a birthday gift for a friend, in one sentence.",
+  "pool": "gift.json",
+  "gram": "gift.G.bin",
+  "model": "Qwen3 14B",
+  "N": 200,
+  "Tprime": 1.0,
+  "embedder": "Qwen/Qwen3-Embedding-0.6B"
+ },
+ {
+  "id": "city",
+  "prompt": "Name a city worth visiting and say why, in one sentence.",
+  "pool": "city.json",
+  "gram": "city.G.bin",
+  "model": "Qwen3 14B",
+  "N": 200,
+  "Tprime": 1.0,
+  "embedder": "Qwen/Qwen3-Embedding-0.6B"
+ },
+ {
+  "id": "firstdate",
+  "prompt": "Suggest an idea for a first date, in one sentence.",
+  "pool": "firstdate.json",
+  "gram": "firstdate.G.bin",
+  "model": "Qwen3 14B",
+  "N": 200,
+  "Tprime": 1.0,
+  "embedder": "Qwen/Qwen3-Embedding-0.6B"
+ },
+ {
+  "id": "dinner",
+  "prompt": "Suggest something to cook for dinner tonight, in one sentence.",
+  "pool": "dinner.json",
+  "gram": "dinner.G.bin",
+  "model": "Qwen3 14B",
+  "N": 200,
+  "Tprime": 1.0,
+  "embedder": "Qwen/Qwen3-Embedding-0.6B"
+ },
+ {
+  "id": "story",
+  "prompt": "Write the opening sentence of a short story. Reply with one sentence only.",
+  "pool": "story.json",
+  "gram": "story.G.bin",
+  "model": "Qwen3 14B",
+  "N": 200,
+  "Tprime": 1.0,
+  "embedder": "Qwen/Qwen3-Embedding-0.6B"
+ }
+]

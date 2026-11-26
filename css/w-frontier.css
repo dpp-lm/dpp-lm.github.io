@@ -1,0 +1,38 @@
+.w-frontier { display: block; }
+.w-frontier .w-frontier-tabs { margin-bottom: 1rem; }
+.w-frontier .w-frontier-tab { flex-direction: column; gap: 0.1rem; padding: 0.4rem 0.5rem; line-height: 1.25; }
+.w-frontier .w-frontier-tab-name { font-weight: 600; }
+.w-frontier .w-frontier-tab-sub { font-size: var(--text-xs); color: var(--ink-3); }
+.w-frontier .w-frontier-tab[aria-selected="true"] .w-frontier-tab-sub { color: var(--ink-2); }
+.w-frontier .w-frontier-title { margin-bottom: 0.5rem; }
+.w-frontier .w-frontier-legend { gap: 0.4rem; margin-bottom: 0.5rem; }
+.w-frontier .w-frontier-strike { stroke: var(--ink); stroke-width: 1.5; display: none; }
+.w-frontier .legend-item[aria-pressed="false"] .w-frontier-strike { display: block; }
+.w-frontier .w-frontier-tip-head .w-frontier-strike { display: none; }
+.w-frontier .w-frontier-swatch { flex: none; width: 40px; height: 10px; }
+.w-frontier .w-frontier-chart { position: relative; width: 100%; }
+.w-frontier .w-frontier-svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; }
+.w-frontier .w-frontier-grid line { stroke: var(--line); stroke-width: 1; }
+.w-frontier .w-frontier-frame { fill: none; stroke: var(--line-strong); }
+.w-frontier .w-frontier-tick { fill: var(--ink-2); font-size: 12px; font-family: var(--font); font-variant-numeric: tabular-nums; }
+.w-frontier .w-frontier-axis { fill: var(--ink); font-size: 12.5px; font-family: var(--font); }
+.w-frontier .w-frontier-line { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; }
+.w-frontier .w-frontier-bar { fill: none; stroke: var(--c); stroke-width: 1; opacity: 0.75; }
+.w-frontier .w-frontier-dot { fill: var(--c); stroke: var(--surface); stroke-width: 1; }
+.w-frontier .w-frontier-dot.is-on { stroke: var(--ink); stroke-width: 2; }
+.w-frontier .w-frontier-svg { cursor: crosshair; }
+.w-frontier .w-frontier-hit { fill: transparent; stroke: none; pointer-events: none; }
+.w-frontier .w-frontier-ring { fill: none; stroke: var(--ink); stroke-width: 1.5; opacity: 0; pointer-events: none; }
+.w-frontier .w-frontier-ring.is-on { opacity: 1; }
+.w-frontier .w-frontier-hit:focus { outline: none; }
+.w-frontier .w-frontier-hit:focus-visible { stroke: var(--focus); stroke-width: 2; }
+.w-frontier .w-frontier-pl { fill: var(--ink-2); font-size: 11.5px; font-family: var(--font); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.w-frontier .w-frontier-tip { position: absolute; z-index: 2; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-s); box-shadow: var(--shadow); padding: 0.45rem 0.6rem; font-size: var(--text-xs); line-height: 1.45; max-width: min(17rem, calc(100% - 8px)); font-variant-numeric: tabular-nums; }
+.w-frontier .w-frontier-tip[hidden] { display: none; }
+.w-frontier .w-frontier-tip-head { display: flex; align-items: center; gap: 0.4rem; font-weight: 600; margin-bottom: 0.15rem; }
+.w-frontier .w-frontier-caption { margin: 0.9rem 0 0.6rem; }
+.w-frontier .w-frontier-result { margin: 0; padding: 0.6rem 0.8rem; background: var(--accent-soft); border-radius: var(--radius-s); font-size: var(--text-s); line-height: 1.5; }
+.w-frontier .w-frontier-error { color: var(--ink-2); }
+@media (max-width: 520px) {
+  .w-frontier .w-frontier-tab { padding: 0.4rem 0.2rem; }
+}

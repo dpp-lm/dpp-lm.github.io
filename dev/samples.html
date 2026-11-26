@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samples widget</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/w-samples.css">
+<style>body { margin: 0; padding: 1rem; background: var(--bg); color: var(--ink); font-family: var(--font); } .wrap { max-width: var(--w-wide); margin: 0 auto; }</style>
+</head>
+<body>
+<div class="wrap"><div class="widget" id="w"></div></div>
+<script type="module">
+import { mount } from '../js/w-samples.js';
+mount(document.getElementById('w'));
+</script>
+</body>
+</html>

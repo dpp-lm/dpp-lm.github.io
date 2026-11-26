@@ -1,0 +1,28 @@
+.widget.w-hero { background: transparent; border: 0; box-shadow: none; padding: 0; max-width: 420px; width: 100%; }
+.w-hero .wh-plot { width: 100%; }
+.w-hero .wh-svg { display: block; max-width: 100%; touch-action: manipulation; }
+.w-hero .wh-axis { stroke: var(--line-strong); stroke-width: 1; }
+.w-hero .wh-area { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.w-hero .wh-origin { fill: var(--ink-2); }
+.w-hero .wh-arrow { cursor: pointer; outline: none; }
+.w-hero .wh-hit { stroke: transparent; stroke-width: 16; stroke-linecap: round; }
+.w-hero .wh-hhit { fill: transparent; }
+.w-hero .wh-shaft { stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; transition: stroke 0.25s, stroke-width 0.25s; }
+.w-hero .wh-handle { fill: var(--surface); stroke: var(--ink-3); stroke-width: 2; transition: fill 0.25s, stroke 0.25s; }
+.w-hero .wh-arrow.is-sel .wh-shaft { stroke: var(--accent); stroke-width: 4; }
+.w-hero .wh-arrow.is-sel .wh-handle { fill: var(--accent); stroke: var(--accent); }
+.w-hero .wh-arrow:focus-visible .wh-handle { stroke: var(--focus); stroke-width: 3.5; }
+.w-hero .wh-label { fill: var(--ink-2); font-family: var(--font); font-size: 12px; transition: fill 0.25s; cursor: pointer; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+.w-hero .wh-label.is-sel { fill: var(--accent); font-weight: 600; }
+.w-hero .wh-leader { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 2 2; pointer-events: none; }
+.w-hero .wh-line { margin: 0.4rem 0 0; font-size: var(--text-s); line-height: 1.45; display: grid; gap: 0.1rem; max-width: 22rem; }
+.w-hero .wh-names { font-weight: 600; }
+.w-hero .wh-stat { color: var(--ink-2); display: flex; justify-content: space-between; gap: 1rem; }
+.w-hero .wh-num { font-weight: 600; color: var(--accent); }
+.w-hero .wh-stat:last-child .wh-num { color: var(--m-ancestral); }
+.w-hero .wh-capline { display: flex; align-items: flex-end; gap: 0.75rem; margin-top: 0.5rem; }
+.w-hero .wh-capline .wh-caption { flex: 1; }
+.w-hero .wh-capline button { flex: none; }
+.w-hero .wh-playlab { display: grid; }
+.w-hero .wh-playlab > span { grid-area: 1 / 1; }
+.w-hero .wh-playlab > .is-off { visibility: hidden; }

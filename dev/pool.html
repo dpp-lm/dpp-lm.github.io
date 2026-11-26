@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pool widget</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/w-pool.css">
+<style>
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); }
+  main { max-width: var(--w-wide); margin: 0 auto; padding: var(--gutter); }
+</style>
+</head>
+<body>
+<main>
+  <div class="widget" id="w"></div>
+</main>
+<script type="module">
+  import { mount } from '../js/w-pool.js';
+  mount(document.getElementById('w'));
+</script>
+</body>
+</html>
