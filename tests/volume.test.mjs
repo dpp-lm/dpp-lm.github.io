@@ -68,14 +68,14 @@ test('normalizer equals the sum of the pair determinants', () => {
   close(z, sum(rows.map((r) => r.det)));
 });
 
-test('default configuration: top pairs and the (Novel, Poetry book) probability', () => {
+test('default configuration: top pairs and the (Photo album, Photo book) probability', () => {
   const { rows } = dppPairs(TOY, 1);
   const ind = indepPairs(TOY).rows;
   const top3 = rows.slice(0, 3).map((r) => `${TOY[r.i].short} + ${TOY[r.j].short}: ${(100 * r.prob).toFixed(1)}%`);
   const np = rows.find((r) => r.i === 0 && r.j === 1);
   const npInd = ind.find((r) => r.i === 0 && r.j === 1);
   console.log('top three at T = 1:', top3.join('; '));
-  console.log(`(Novel, Poetry book): 2-DPP ${(100 * np.prob).toFixed(2)}%, independent ${(100 * npInd.prob).toFixed(2)}%`);
+  console.log(`(Photo album, Photo book): 2-DPP ${(100 * np.prob).toFixed(2)}%, independent ${(100 * npInd.prob).toFixed(2)}%`);
   assert.equal(topPair(TOY, 1).i, rows[0].i);
   assert.ok(np.prob < npInd.prob);
 });
@@ -84,8 +84,8 @@ import { mostDifferentPair, fitView, placeLabels } from '../js/w-volume-lib.js';
 
 test('most different pair is the one with the largest angle, and differs from the top pair at T = 1', () => {
   const m = mostDifferentPair(TOY);
-  assert.deepEqual([m.i, m.j], [0, 5]);
-  assert.equal(m.angle, 152);
+  assert.deepEqual([m.i, m.j], [0, 3]);
+  assert.equal(m.angle, 72);
   const t = topPair(TOY, 1);
   assert.notDeepEqual([m.i, m.j], [t.i, t.j]);
 });

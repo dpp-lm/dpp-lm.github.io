@@ -1,20 +1,21 @@
-// Widget "hero": six answers as arrows that cycle through pairs, each pair's parallelogram and probabilities.
-import { TOY, TOY_PROMPT } from './toy.js';
+// Widget "hero": six answers as arrows in one quadrant that cycle through pairs, each pair's parallelogram and probabilities.
+import { TOY, TOY_PROMPT, TOY_AXES } from './toy.js';
 import { length, pairDet, normalizer, indepPairs, fitContent, placeLabels } from './w-volume-lib.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const RAD = Math.PI / 180;
 const FONT = 12;
+const GUT = 16; // room for the axis titles: left of the vertical axis and below the horizontal one
 const T = 1;
 const INTERVAL = 5000;
 const TWEEN = 900;
-// Alternates similar pairs (small angle) and different pairs (large angle).
+// Alternates two wordings of one gift (small angle) and two different gifts (large angle).
 const SEQUENCE = [[0, 1], [0, 2], [2, 3], [1, 4], [4, 5], [2, 5]];
 // Every pair a visitor can select; the fixed view fits all of their parallelograms.
 const ALL_PAIRS = TOY.flatMap((_, i) => TOY.map((_, j) => [i, j]).filter(([, j]) => j > i));
 const REDUCED_PAIR = [0, 2];
 const coarse = () => matchMedia('(pointer: coarse)').matches;
-const pct = (x) => (100 * x).toFixed(1) + '%';
+const pct = (x) => (x > 0 && x < 0.0005 ? '<0.1%' : (100 * x).toFixed(1) + '%');
 
 const el = (tag, attrs = {}, text) => {
   const n = document.createElementNS(NS, tag);
@@ -42,7 +43,7 @@ export function mount(root) {
   root.classList.add('w-hero');
   root.textContent = '';
   const plotBox = h('div', 'wh-plot');
-  const svg = el('svg', { class: 'wh-svg', role: 'group', 'aria-label': 'Six answers as arrows from the origin' });
+  const svg = el('svg', { class: 'wh-svg', role: 'group', 'aria-label': `Six answers as arrows from the origin. Horizontal: ${TOY_AXES.x.toLowerCase()}. Vertical: ${TOY_AXES.y.toLowerCase()}.` });
   plotBox.append(svg);
   const line = h('p', 'wh-line');
   line.setAttribute('aria-live', 'off');
@@ -67,7 +68,7 @@ export function mount(root) {
   let timer = null, tween = null;
   let W = 0, H = 0, widths = [];
   let view = null, vecU = null; // view = { s, ox, oy }, vecU = unit-scale vectors of the drawn parallelogram
-  let arrows = [], labelEls = [], leaders = [], areaEl = null, axisEl = null, originEl = null;
+  let arrows = [], labelEls = [], leaders = [], areaEl = null, axisX = null, axisY = null, titleX = null, titleY = null, originEl = null;
   const unitVec = (i) => {
     const L = length(items[i].p, T), a = items[i].angle * RAD;
     return [L * Math.cos(a), L * Math.sin(a)];
@@ -78,8 +79,9 @@ export function mount(root) {
     const ctx = h('canvas').getContext('2d');
     ctx.font = `600 ${FONT}px ${getComputedStyle(root).fontFamily || 'sans-serif'}`;
     widths = items.map((it) => ctx.measureText(it.short).width);
-    view = fitContent({ items, T, pairList: ALL_PAIRS, W, hMin: 0.45 * W, hMax: 0.75 * W, labelW: widths, labelH: FONT + 5 });
-    H = view.H;
+    view = fitContent({ items, T, pairList: ALL_PAIRS, W: W - GUT, hMin: 0.45 * W, hMax: 0.75 * W, margin: 8, labelW: widths, labelH: FONT + 5 });
+    view.ox += GUT;
+    H = view.H + GUT;
   }
 
   function build() {
@@ -87,7 +89,10 @@ export function mount(root) {
     svg.textContent = '';
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.setAttribute('width', W); svg.setAttribute('height', H);
-    axisEl = el('line', { class: 'wh-axis' }); svg.append(axisEl);
+    axisX = el('line', { class: 'wh-axis' }); axisY = el('line', { class: 'wh-axis' });
+    titleX = el('text', { class: 'wh-axt', 'text-anchor': 'end' }, TOY_AXES.x);
+    titleY = el('text', { class: 'wh-axt', 'text-anchor': 'end' }, TOY_AXES.y);
+    svg.append(axisX, axisY, titleX, titleY);
     areaEl = el('polygon', { class: 'wh-area' }); svg.append(areaEl);
     arrows = items.map((it, i) => {
       const g = el('g', { class: 'wh-arrow', tabindex: 0, role: 'button', 'data-i': i, 'aria-label': `${it.short}, probability ${pct(it.p)}` });
@@ -120,7 +125,10 @@ export function mount(root) {
   // Position every element from the view and the (possibly mid-tween) parallelogram vectors.
   function place() {
     const { s, ox, oy } = view;
-    axisEl.setAttribute('x1', 0); axisEl.setAttribute('x2', W); axisEl.setAttribute('y1', oy); axisEl.setAttribute('y2', oy);
+    axisX.setAttribute('x1', ox); axisX.setAttribute('x2', W); axisX.setAttribute('y1', oy); axisX.setAttribute('y2', oy);
+    axisY.setAttribute('x1', ox); axisY.setAttribute('x2', ox); axisY.setAttribute('y1', oy); axisY.setAttribute('y2', 0);
+    titleX.setAttribute('x', W - 2); titleX.setAttribute('y', oy + 15);
+    titleY.setAttribute('transform', `translate(${ox - 7} 2) rotate(-90)`);
     originEl.setAttribute('cx', ox); originEl.setAttribute('cy', oy);
     const tips = items.map((_, i) => { const [ux, uy] = unitVec(i); return { x: ox + ux * s, y: oy - uy * s, L: Math.hypot(ux, uy) * s }; });
     arrows.forEach((a, i) => {

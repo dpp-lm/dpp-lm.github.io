@@ -51,7 +51,7 @@
 .w-pool .w-pool-lg-bar { width: 1.2rem; height: 0.55rem; background: var(--m-samp); border-radius: 2px; }
 .w-pool .w-pool-lg-tick { width: 2px; height: 0.8rem; background: var(--ink-2); }
 .w-pool .w-pool-scale { margin-left: auto; }
-.w-pool .w-pool-prow { display: grid; grid-template-columns: minmax(7rem, 14rem) minmax(0, 1fr) 2.8rem; gap: 0.5rem; align-items: center; height: 20px; }
+.w-pool .w-pool-prow { display: grid; grid-template-columns: minmax(7rem, 16.5rem) minmax(0, 1fr) 2.8rem; gap: 0.5rem; align-items: center; height: 20px; }
 .w-pool .w-pool-pname { font-size: var(--text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .w-pool .w-pool-ptrack { height: 0.7rem; }
 .w-pool .w-pool-zero .w-pool-pname, .w-pool .w-pool-zero .w-pool-pnum { color: var(--ink-3); }

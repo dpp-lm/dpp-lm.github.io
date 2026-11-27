@@ -83,7 +83,7 @@
     <p class="buttons">
       <a class="btn btn-primary" href="https://arxiv.org/abs/2611.25003">Paper</a>
       <a class="btn" href="https://neurips.cc/virtual/2026/poster/151475">NeurIPS page</a>
-      <a class="btn" href="https://github.com/rycolab/pool-dpp">Code</a>
+      <a class="btn" href="https://github.com/rycolab/pool-dpp">Experiment code</a>
       <a class="btn" href="/demo/">Live demo</a>
       <a class="btn" href="#cite">Cite</a>
     </p>
@@ -152,7 +152,7 @@
       <h3>Guarantee</h3>
       <p>Write \(p_K\) for the target K-DPP over all strings and \(\bar\pi\) for the distribution of the set that PoolDPP-Samp returns, averaged over random pools. Then</p>
       <p class="eq">\[ \begin{aligned} \mathrm{KL}\big(p_K \,\|\, \bar\pi\big) &\le \log\!\Big(1 + \frac{\operatorname{Var}(\hat Z)}{Z^2}\Big) \\ &\le \frac{K^2 \rho}{N - K + 1} \end{aligned} \]</p>
-      <p>where \(Z\) is the target's normalizer, \(\hat Z\) is its estimate from the pool, and \(\rho\) measures the mismatch between the proposal and the target (the second bound needs a finite \(\rho\)). The bound holds at every pool size and decays as \(1/N\). It is an upper bound, so the divergence can fall faster, as it does in the toy model above. It covers PoolDPP-Samp only: PoolDPP-MAP is a deterministic function of the pool and has no distributional guarantee. The theorems are formalized in Lean, see the <a href="https://github.com/rycolab/pool-dpp/tree/main/lean">code repository</a>.</p>
+      <p>where \(Z\) is the target's normalizer, \(\hat Z\) is its estimate from the pool, and \(\rho\) measures the mismatch between the proposal and the target (the second bound needs a finite \(\rho\)). The bound holds at every pool size and decays as \(1/N\). It is an upper bound, so the divergence can fall faster, as it does in the toy model above. It covers PoolDPP-Samp only: PoolDPP-MAP is a deterministic function of the pool and has no distributional guarantee. The theorems are formalized in Lean, see the <a href="https://github.com/rycolab/pool-dpp/tree/main/lean">Lean files</a>.</p>
     </aside>
   </div>
 </section>

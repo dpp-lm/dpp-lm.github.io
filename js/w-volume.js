@@ -1,5 +1,5 @@
 // Widget "volume": the squared area spanned by two quality-scaled embeddings is the 2-DPP score of a pair.
-import { TOY, TOY_PROMPT } from './toy.js';
+import { TOY, TOY_PROMPT, TOY_AXES } from './toy.js';
 import { bindRange } from './ui-range.js';
 import { quality, length, sin2, dppPairs, indepPairs, topPair, mostDifferentPair, placeLabels } from './w-volume-lib.js';
 
@@ -8,10 +8,12 @@ const RAD = Math.PI / 180;
 const T_MIN = 0.3, T_MAX = 5, T_DEFAULT = 1;
 const DEFAULT_SEL = [0, 1];
 const FONT = 12;
+// Arrows stay in the first quadrant, where a larger angle between two arrows always means a larger area.
+const A_MIN = 2, A_MAX = 88;
 
 const sliderToT = (v) => T_MIN * Math.pow(T_MAX / T_MIN, v / 1000);
 const tToSlider = (T) => (1000 * Math.log(T / T_MIN)) / Math.log(T_MAX / T_MIN);
-const pct = (x) => (100 * x).toFixed(1) + '%';
+const pct = (x) => (x > 0 && x < 0.0005 ? '<0.1%' : (100 * x).toFixed(1) + '%');
 const SUP = { '-': '⁻', 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
 function num(x) {
   if (x === 0) return '0';
@@ -59,19 +61,19 @@ export function mount(root) {
   ends.append(h('span', null, 'favors quality'), h('span', null, 'favors diversity'));
   tBlock.append(tLabel, slider, ends);
   const btns = h('div', 'wv-btns');
-  const bBooks = h('button', null, 'Two books');
+  const bSame = h('button', null, 'Same gift, two wordings');
   const bTop = h('button', null, 'Most likely pair');
   const bDiff = h('button', null, 'Most different pair');
   const bReset = h('button', null, 'Reset');
-  for (const b of [bBooks, bTop, bDiff, bReset]) b.type = 'button';
-  btns.append(bBooks, bTop, bDiff, bReset);
+  for (const b of [bSame, bTop, bDiff, bReset]) b.type = 'button';
+  btns.append(bSame, bTop, bDiff, bReset);
   controls.append(tBlock, btns);
 
   // ---- panels
   const grid = h('div', 'wv-grid');
   const plotPanel = h('div', 'wv-plotpanel');
   const plotBox = h('div', 'wv-plotbox');
-  const svg = el('svg', { class: 'wv-svg', role: 'group', 'aria-label': 'Six answers as arrows from the origin' });
+  const svg = el('svg', { class: 'wv-svg', role: 'group', 'aria-label': `Six answers as arrows from the origin. Horizontal: ${TOY_AXES.x.toLowerCase()}. Vertical: ${TOY_AXES.y.toLowerCase()}.` });
   plotBox.append(svg);
   const plotNote = h('p', 'wv-help fig-note', 'Select two arrows or drag a tip. Length is the square root of quality, relative to the longest arrow.');
   const readout = h('div', 'wv-readout');
@@ -94,19 +96,20 @@ export function mount(root) {
     return items.map((it) => measure.measureText(it.short).width);
   };
 
+  // The plot is a square of side W, with the origin at its lower left.
   function frame() {
-    return { W: Math.max(260, Math.floor(plotBox.clientWidth || 320)) };
+    return { W: Math.max(260, Math.min(SIDE_MAX, Math.floor(plotBox.clientWidth || 320))) };
   }
   // One fixed frame for every pair, drag angle, and T. Scaling all lengths by one factor leaves the 2-DPP unchanged,
-  // so lengths are drawn relative to the longest arrow, which keeps R pixels. With angles in [2, 178] degrees, a far
-  // corner lies within REACH * R of the origin, where REACH = 1 + the second-longest relative length at T_MAX.
+  // so lengths are drawn relative to the longest arrow, which keeps R pixels. With angles in [A_MIN, A_MAX], a far
+  // corner lies within REACH * R of the origin along each axis, where REACH = 1 + the second-longest relative
+  // length at T_MAX. GUT holds the axis titles, left of the vertical axis and below the horizontal one.
   const REACH = (() => { const l = items.map((it) => length(it.p, T_MAX)).sort((a, b) => b - a); return 1 + l[1] / l[0]; })();
-  const MARGIN = 12;
+  const MARGIN = 12, GUT = 18, SIDE_MAX = 440;
   function viewAt(T) {
     const { W } = frame();
-    const R = (W - 2 * MARGIN) / (2 * REACH);
-    const H = Math.ceil(REACH * R + 2 * MARGIN);
-    return { W, H, s: R / Math.max(...items.map((it) => length(it.p, T))), ox: W / 2, oy: H - MARGIN, T };
+    const R = (W - GUT - MARGIN) / REACH;
+    return { W, H: W, s: R / Math.max(...items.map((it) => length(it.p, T))), ox: GUT, oy: W - GUT, T };
   }
   const tipAt = (i, v) => {
     const L = length(items[i].p, v.T) * v.s;
@@ -126,22 +129,30 @@ export function mount(root) {
     svg.textContent = '';
     const { ox, oy } = v;
     const [sa, sb] = state.sel;
-    svg.append(el('line', { class: 'wv-axis', x1: 0, y1: oy, x2: W, y2: oy }));
+    svg.append(el('line', { class: 'wv-axis', x1: ox, y1: oy, x2: W, y2: oy }));
+    svg.append(el('line', { class: 'wv-axis', x1: ox, y1: oy, x2: ox, y2: 0 }));
+    svg.append(el('text', { class: 'wv-axt', x: W - 2, y: oy + 14, 'text-anchor': 'end' }, TOY_AXES.x));
+    svg.append(el('text', { class: 'wv-axt', transform: `translate(${ox - 6} 2) rotate(-90)`, 'text-anchor': 'end' }, TOY_AXES.y));
 
     const tips = items.map((_, i) => tipAt(i, v));
     const A = tips[sa], B = tips[sb];
     const pts = [[ox, oy], [A.x, A.y], [A.x + B.x - ox, A.y + B.y - oy], [B.x, B.y]];
     svg.append(el('polygon', { class: 'wv-area', points: pts.map((p) => p.join(',')).join(' ') }));
     const areaPx = Math.abs((A.x - ox) * (B.y - oy) - (A.y - oy) * (B.x - ox));
-    if (areaPx > 12000) {
-      const cx = (pts[0][0] + pts[2][0]) / 2, cy = (pts[0][1] + pts[2][1]) / 2;
-      const a = items[sa], b = items[sb];
-      const t = el('text', { class: 'wv-areatext', x: cx, y: cy + 4, 'text-anchor': 'middle' }, `area² ${num(quality(a.p, state.T) * quality(b.p, state.T) * sin2(a, b))}`);
-      svg.append(t);
-    }
+    const areaText = areaPx > 12000 ? el('text', { class: 'wv-areatext', 'text-anchor': 'middle' }, `area² ${num(quality(items[sa].p, state.T) * quality(items[sb].p, state.T) * sin2(items[sa], items[sb]))}`) : null;
+    if (areaText) svg.append(areaText);
 
     const widths = labelWidths();
     const boxes = placeLabels({ items, tips, ox, oy, W, widths, rMin: Math.max(34, 0.09 * W), h: FONT + 5 });
+    if (areaText) {
+      // On the diagonal of the parallelogram, at the spot nearest its center that is clear of the answer labels and tips.
+      const tw = 7.2 * areaText.textContent.length, th = 16;
+      const clear = ([cx, cy]) => boxes.every((b) => Math.abs(b.cx - cx) >= (b.w + tw) / 2 || Math.abs(b.cy - cy) >= (b.h + th) / 2)
+        && tips.every((t) => Math.abs(t.x - cx) >= tw / 2 + 9 || Math.abs(t.y - cy) >= th / 2 + 9);
+      const spots = [0.5, 0.6, 0.4, 0.7, 0.3, 0.8].map((u) => [ox + (pts[2][0] - ox) * u, oy + (pts[2][1] - oy) * u]);
+      const [cx, cy] = spots.find(clear) || spots[0];
+      areaText.setAttribute('x', cx); areaText.setAttribute('y', cy + 4);
+    }
 
     const order = items.map((_, i) => i).sort((a, b) => (state.sel.includes(a) ? 1 : 0) - (state.sel.includes(b) ? 1 : 0));
     for (const i of order) {
@@ -151,7 +162,7 @@ export function mount(root) {
         class: 'wv-arrow' + (sel ? ' is-sel' : ''),
         tabindex: 0, role: 'slider', 'data-i': i,
         'aria-label': `${items[i].short}, probability ${pct(items[i].p)}`,
-        'aria-valuemin': 2, 'aria-valuemax': 178, 'aria-valuenow': Math.round(items[i].angle),
+        'aria-valuemin': A_MIN, 'aria-valuemax': A_MAX, 'aria-valuenow': Math.round(items[i].angle),
         'aria-valuetext': `${Math.round(items[i].angle)} degrees${sel ? ', selected' : ''}`,
       });
       g.append(el('line', { class: 'wv-hit', x1: ox, y1: oy, x2: t.x, y2: t.y }));
@@ -221,7 +232,7 @@ export function mount(root) {
     const y = (e.clientY - r.top) * (geo.H / r.height);
     return Math.atan2(view.oy - y, x - view.ox) / RAD;
   }
-  function setAngle(i, a) { items[i].angle = Math.min(178, Math.max(2, a)); }
+  function setAngle(i, a) { items[i].angle = Math.min(A_MAX, Math.max(A_MIN, a)); }
   function onMove(e) {
     if (!drag || e.pointerId !== drag.id) return;
     setAngle(drag.i, pointerAngle(e));
@@ -342,7 +353,7 @@ export function mount(root) {
 
   // ---- controls
   slider.addEventListener('input', () => { state.T = sliderToT(+slider.value); update(true); });
-  bBooks.addEventListener('click', () => { state.sel = [0, 1]; update(true); });
+  bSame.addEventListener('click', () => { state.sel = [0, 1]; update(true); });
   bTop.addEventListener('click', () => { const t = topPair(items, state.T); state.sel = [t.i, t.j]; update(true); });
   bDiff.addEventListener('click', () => { const m = mostDifferentPair(items); state.sel = [m.i, m.j]; update(true); });
   bReset.addEventListener('click', () => {
@@ -351,7 +362,7 @@ export function mount(root) {
     update(true);
   });
 
-  // First-view hint: the Houseplant tip swings 12 degrees and back, then stops.
+  // First-view hint: the Board game tip swings 12 degrees and back, then stops.
   const HINT_I = 4;
   function stopHint() { if (hint) { cancelAnimationFrame(hint.raf); items[HINT_I].angle = hint.base; hint = null; update(false); } }
   function playHint() {
@@ -379,7 +390,7 @@ export function mount(root) {
   if (typeof ResizeObserver !== 'undefined') {
     let last = geo.W;
     new ResizeObserver(() => {
-      const w = Math.max(260, Math.floor(plotBox.clientWidth || 320));
+      const w = frame().W;
       if (w !== last && !drag) { last = w; update(); }
     }).observe(plotBox);
   }

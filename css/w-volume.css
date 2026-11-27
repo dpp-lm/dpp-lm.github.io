@@ -10,8 +10,9 @@
 
 .w-volume .wv-plotbox { width: 100%; background: var(--surface); }
 .w-volume .wv-help { margin-top: 0.35rem; }
-.w-volume .wv-svg { display: block; max-width: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+.w-volume .wv-svg { display: block; margin: 0 auto; max-width: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
 .w-volume .wv-axis { stroke: var(--line-strong); stroke-width: 1; }
+.w-volume .wv-axt { fill: var(--ink-3); font-family: var(--font); font-size: 12px; pointer-events: none; }
 .w-volume .wv-area { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
 .w-volume .wv-areatext { fill: var(--accent); font-size: 12px; font-weight: 600; pointer-events: none; paint-order: stroke; stroke: var(--accent-soft); stroke-width: 3px; }
 .w-volume .wv-origin { fill: var(--ink-2); }
