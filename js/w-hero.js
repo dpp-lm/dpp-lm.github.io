@@ -1,18 +1,16 @@
-// Widget "hero": six answers as arrows in one quadrant that cycle through pairs, each pair's parallelogram and probabilities.
-import { TOY, TOY_PROMPT, TOY_AXES } from './toy.js';
-import { length, pairDet, normalizer, indepPairs, fitContent, placeLabels } from './w-volume-lib.js';
+// Widget "hero": six answers as arrows from the origin of a plane with two named scales; the cycle selects pairs and shows each pair's parallelogram and probabilities.
+import { HERO_TOY, TOY_PROMPT, HERO_AXES } from './toy-hero.js';
+import { length, pairDet, normalizer, indepPairs } from './w-volume-lib.js';
+import { layoutHero } from './w-hero-lib.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const RAD = Math.PI / 180;
 const FONT = 12;
-const GUT = 16; // room for the axis titles: left of the vertical axis and below the horizontal one
 const T = 1;
 const INTERVAL = 5000;
 const TWEEN = 900;
 // Alternates two wordings of one gift (small angle) and two different gifts (large angle).
 const SEQUENCE = [[0, 1], [0, 2], [2, 3], [1, 4], [4, 5], [2, 5]];
-// Every pair a visitor can select; the fixed view fits all of their parallelograms.
-const ALL_PAIRS = TOY.flatMap((_, i) => TOY.map((_, j) => [i, j]).filter(([, j]) => j > i));
 const REDUCED_PAIR = [0, 2];
 const coarse = () => matchMedia('(pointer: coarse)').matches;
 const pct = (x) => (x > 0 && x < 0.0005 ? '<0.1%' : (100 * x).toFixed(1) + '%');
@@ -31,7 +29,7 @@ const h = (tag, cls, text) => {
 };
 
 export function mount(root) {
-  const items = TOY.map((t) => ({ ...t }));
+  const items = HERO_TOY.map((t) => ({ ...t }));
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const z = normalizer(items, T);
   const ind = new Map(indepPairs(items).rows.map((r) => [r.i * 10 + r.j, r.prob]));
@@ -43,7 +41,7 @@ export function mount(root) {
   root.classList.add('w-hero');
   root.textContent = '';
   const plotBox = h('div', 'wh-plot');
-  const svg = el('svg', { class: 'wh-svg', role: 'group', 'aria-label': `Six answers as arrows from the origin. Horizontal: ${TOY_AXES.x.toLowerCase()}. Vertical: ${TOY_AXES.y.toLowerCase()}.` });
+  const svg = el('svg', { class: 'wh-svg', role: 'group', 'aria-label': 'Six answers as arrows from the origin. Horizontal scale: object to experience. Vertical scale: generic to personal.' });
   plotBox.append(svg);
   const line = h('p', 'wh-line');
   line.setAttribute('aria-live', 'off');
@@ -67,8 +65,8 @@ export function mount(root) {
   const state = { sel: [...(reduced() ? REDUCED_PAIR : SEQUENCE[0])], step: 0, userPaused: false, hoverPaused: false, visible: true };
   let timer = null, tween = null;
   let W = 0, H = 0, widths = [];
-  let view = null, vecU = null; // view = { s, ox, oy }, vecU = unit-scale vectors of the drawn parallelogram
-  let arrows = [], labelEls = [], leaders = [], areaEl = null, axisX = null, axisY = null, titleX = null, titleY = null, originEl = null;
+  let view = null, vecU = null; // view = layoutHero result, vecU = unit-scale vectors of the drawn parallelogram
+  let arrows = [], labelEls = [], areaEl = null, originEl = null;
   const unitVec = (i) => {
     const L = length(items[i].p, T), a = items[i].angle * RAD;
     return [L * Math.cos(a), L * Math.sin(a)];
@@ -76,12 +74,14 @@ export function mount(root) {
 
   function measure() {
     W = Math.max(250, Math.min(420, Math.floor(plotBox.clientWidth || 380)));
+    H = Math.round(0.76 * W);
     const ctx = h('canvas').getContext('2d');
     ctx.font = `600 ${FONT}px ${getComputedStyle(root).fontFamily || 'sans-serif'}`;
-    widths = items.map((it) => ctx.measureText(it.short).width);
-    view = fitContent({ items, T, pairList: ALL_PAIRS, W: W - GUT, hMin: 0.45 * W, hMax: 0.75 * W, margin: 8, labelW: widths, labelH: FONT + 5 });
-    view.ox += GUT;
-    H = view.H + GUT;
+    widths = items.map((it) => ctx.measureText(it.short).width + 2);
+    ctx.font = `400 ${FONT}px ${getComputedStyle(root).fontFamily || 'sans-serif'}`;
+    const titleW = {};
+    for (const k of Object.keys(HERO_AXES)) titleW[k] = ctx.measureText(HERO_AXES[k]).width + 2;
+    view = layoutHero({ items, T, W, H, labelW: widths, labelH: FONT + 5, titleW, avoidPairs: SEQUENCE });
   }
 
   function build() {
@@ -89,11 +89,12 @@ export function mount(root) {
     svg.textContent = '';
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.setAttribute('width', W); svg.setAttribute('height', H);
-    axisX = el('line', { class: 'wh-axis' }); axisY = el('line', { class: 'wh-axis' });
-    titleX = el('text', { class: 'wh-axt', 'text-anchor': 'end' }, TOY_AXES.x);
-    titleY = el('text', { class: 'wh-axt', 'text-anchor': 'end' }, TOY_AXES.y);
-    svg.append(axisX, axisY, titleX, titleY);
+    const { ox, oy } = view;
+    svg.append(el('line', { class: 'wh-axis', x1: 0, x2: W, y1: oy, y2: oy }), el('line', { class: 'wh-axis', x1: ox, x2: ox, y1: 0, y2: H }));
     areaEl = el('polygon', { class: 'wh-area' }); svg.append(areaEl);
+    for (const [k, tt] of Object.entries(view.titles)) {
+      svg.append(el('text', { class: 'wh-axt', x: tt.x, y: tt.y + tt.h - 4, 'text-anchor': tt.anchor }, HERO_AXES[k]));
+    }
     arrows = items.map((it, i) => {
       const g = el('g', { class: 'wh-arrow', tabindex: 0, role: 'button', 'data-i': i, 'aria-label': `${it.short}, probability ${pct(it.p)}` });
       const hit = el('line', { class: 'wh-hit' }), shaft = el('line', { class: 'wh-shaft' });
@@ -109,9 +110,16 @@ export function mount(root) {
       return { g, hit, shaft, hh, hd };
     });
     originEl = el('circle', { class: 'wh-origin', r: 3 }); svg.append(originEl);
-    leaders = items.map(() => { const l = el('line', { class: 'wh-leader' }); svg.append(l); return l; });
+    // A label more than 16 px from its tip gets a dashed leader to the nearest point of its box.
+    for (const b of view.labels) {
+      if (b.dist <= 16) continue;
+      const tp = view.tips[b.i];
+      const nx = Math.min(b.x + b.w, Math.max(b.x, tp.x)), ny = Math.min(b.y + b.h, Math.max(b.y, tp.y));
+      svg.append(el('line', { class: 'wh-leader', x1: tp.x, y1: tp.y, x2: nx, y2: ny }));
+    }
     labelEls = items.map((it, i) => {
-      const t = el('text', { class: 'wh-label', 'data-i': i, 'font-size': FONT }, it.short);
+      const b = view.labels[i];
+      const t = el('text', { class: 'wh-label', 'data-i': i, 'font-size': FONT, x: b.x + b.w / 2, y: b.y + b.h / 2 + FONT * 0.35, 'text-anchor': 'middle' }, it.short);
       svg.append(t);
       t.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') state.userPaused = true; choose(i); sync(); });
       return t;
@@ -122,15 +130,10 @@ export function mount(root) {
     setText();
   }
 
-  // Position every element from the view and the (possibly mid-tween) parallelogram vectors.
+  // Only the parallelogram moves: the arrows and labels are fixed by the layout.
   function place() {
-    const { s, ox, oy } = view;
-    axisX.setAttribute('x1', ox); axisX.setAttribute('x2', W); axisX.setAttribute('y1', oy); axisX.setAttribute('y2', oy);
-    axisY.setAttribute('x1', ox); axisY.setAttribute('x2', ox); axisY.setAttribute('y1', oy); axisY.setAttribute('y2', 0);
-    titleX.setAttribute('x', W - 2); titleX.setAttribute('y', oy + 15);
-    titleY.setAttribute('transform', `translate(${ox - 7} 2) rotate(-90)`);
+    const { s, ox, oy, tips } = view;
     originEl.setAttribute('cx', ox); originEl.setAttribute('cy', oy);
-    const tips = items.map((_, i) => { const [ux, uy] = unitVec(i); return { x: ox + ux * s, y: oy - uy * s, L: Math.hypot(ux, uy) * s }; });
     arrows.forEach((a, i) => {
       const t = tips[i];
       for (const n of [a.hit, a.shaft]) { n.setAttribute('x1', ox); n.setAttribute('y1', oy); n.setAttribute('x2', t.x); n.setAttribute('y2', t.y); }
@@ -138,15 +141,6 @@ export function mount(root) {
     });
     const [A, B] = vecU.map(([x, y]) => [x * s, -y * s]);
     areaEl.setAttribute('points', `${ox},${oy} ${ox + A[0]},${oy + A[1]} ${ox + A[0] + B[0]},${oy + A[1] + B[1]} ${ox + B[0]},${oy + B[1]}`);
-    const boxes = placeLabels({ items, tips, ox, oy, W, widths, rMin: 34, h: FONT + 5 });
-    for (const b of boxes) {
-      const t = tips[b.i];
-      labelEls[b.i].setAttribute('x', b.cx - (b.w - 6) / 2); labelEls[b.i].setAttribute('y', b.cy + FONT * 0.35);
-      const nx = Math.min(b.cx + b.w / 2, Math.max(b.cx - b.w / 2, t.x)), ny = Math.min(b.cy + b.h / 2, Math.max(b.cy - b.h / 2, t.y));
-      const l = leaders[b.i], far = Math.hypot(nx - t.x, ny - t.y) > 16;
-      l.style.display = far ? '' : 'none';
-      if (far) { l.setAttribute('x1', t.x); l.setAttribute('y1', t.y); l.setAttribute('x2', nx); l.setAttribute('y2', ny); }
-    }
   }
   function markSelected() {
     arrows.forEach((a, i) => a.g.classList.toggle('is-sel', state.sel.includes(i)));

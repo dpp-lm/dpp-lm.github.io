@@ -2,7 +2,7 @@
 .w-hero .wh-plot { width: 100%; }
 .w-hero .wh-svg { display: block; max-width: 100%; touch-action: manipulation; }
 .w-hero .wh-axis { stroke: var(--line-strong); stroke-width: 1; }
-.w-hero .wh-axt { fill: var(--ink-3); font-family: var(--font); font-size: 12px; }
+.w-hero .wh-axt { fill: var(--ink-3); font-family: var(--font); font-size: 12px; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
 .w-hero .wh-area { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
 .w-hero .wh-origin { fill: var(--ink-2); }
 .w-hero .wh-arrow { cursor: pointer; outline: none; }
